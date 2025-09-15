@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "cross-env TZ=America/Santiago node app.js",
+    "dev": "cross-env TZ=America/Santiago node app.js",
+    "populate": "cross-env TZ=America/Santiago node populate-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,5 +21,8 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.6",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "cross-env": "^10.0.0"
   }
 }

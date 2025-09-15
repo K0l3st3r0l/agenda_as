@@ -4,6 +4,9 @@ const cron = require('node-cron');
 const db = require('./services/db-service');
 const { authenticateToken } = require('./middleware/auth');
 
+// Set timezone to Santiago, Chile
+process.env.TZ = 'America/Santiago';
+
 const app = express();
 const port = 3001;
 
@@ -41,5 +44,7 @@ cron.schedule('0 9 * * *', () => {
 });
 
 app.listen(port, () => {
-  console.log(`Servidor corriendo en puerto ${port}`);
+  console.log(`🚀 Servidor corriendo en puerto ${port}`);
+  console.log(`🌎 Zona horaria configurada: ${process.env.TZ || 'Sistema por defecto'}`);
+  console.log(`📅 Hora actual en Santiago: ${new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })}`);
 });

@@ -60,3 +60,8 @@ jspm_packages/
 # OS
 .DS_Store
 Thumbs.db
+
+# Windows development scripts
+restart-all.bat
+restart-backend.bat
+restart-frontend.bat
