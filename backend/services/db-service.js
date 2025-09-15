@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 // Create database path
 const dbPath = path.join(__dirname, '../db/agenda.db');
@@ -16,6 +17,18 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Create tables
 function createTables() {
+  // Users table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role TEXT DEFAULT 'user',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Clients table
   db.run(`
     CREATE TABLE IF NOT EXISTS clients (
@@ -57,6 +70,32 @@ function createTables() {
   `);
 
   console.log('Tables created or already exist.');
+  createDefaultAdmin();
+}
+
+// Create default admin user
+async function createDefaultAdmin() {
+  const adminExists = await new Promise((resolve, reject) => {
+    db.get('SELECT id FROM users WHERE username = ?', ['admin'], (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+
+  if (!adminExists) {
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    db.run(
+      'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+      ['admin', 'admin@agenda.com', hashedPassword, 'admin'],
+      function(err) {
+        if (err) {
+          console.error('Error creating admin user:', err);
+        } else {
+          console.log('Admin user created successfully');
+        }
+      }
+    );
+  }
 }
 
 module.exports = db;

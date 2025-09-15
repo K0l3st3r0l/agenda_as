@@ -1,20 +1,24 @@
 const express = require('express');
+const cors = require('cors');
 const cron = require('node-cron');
 const db = require('./services/db-service');
+const { authenticateToken } = require('./middleware/auth');
 
 const app = express();
 const port = 3001;
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Initialize database
-require('./services/db-service');
-
 // Routes
-app.use('/api/clients', require('./routes/clients'));
-app.use('/api/cars', require('./routes/cars'));
-app.use('/api/jobs', require('./routes/jobs'));
-app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/auth', require('./routes/auth'));
+
+// Protected routes
+app.use('/api/clients', authenticateToken, require('./routes/clients'));
+app.use('/api/cars', authenticateToken, require('./routes/cars'));
+app.use('/api/jobs', authenticateToken, require('./routes/jobs'));
+app.use('/api/notifications', authenticateToken, require('./routes/notifications'));
 
 // Cron job for reminders (runs every day at 9 AM)
 cron.schedule('0 9 * * *', () => {
@@ -37,5 +41,5 @@ cron.schedule('0 9 * * *', () => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Servidor corriendo en puerto ${port}`);
 });
